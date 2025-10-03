@@ -1,14 +1,85 @@
 {% if messages %}
-
-<div class="container mt-3">
-
+<div class="message-holder container">
     {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show custom-alert shadow-sm" role="alert">
+        <div class="d-flex align-items-center">
+            <!-- Message Tags -->
+            <div class="alert-icon me-3">
+                {% if message.tags == 'success' %}
+                    <i class="bi bi-check2-circle"></i>
+                {% elif message.tags == 'danger' %}
+                    <i class="bi bi-exclamation-octagon"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="bi bi-exclamation-triangle"></i>
+                {% else %}
+                    <i class="bi bi-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="alert-text fw-medium">{{ message }}</div>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
-
 </div>
 
+<style>
+    .message-holder {
+        position: fixed;
+        top: 90px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        pointer-events: none;
+    }
+
+    .custom-alert {
+        pointer-events: auto;
+        background: rgba(0, 0, 0, 0.8) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: none !important;
+        border-left: 4px solid transparent !important;
+        color: #fff !important;
+        border-radius: 12px !important;
+        margin-bottom: 1rem;
+        animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .alert-success { border-left-color: #28a745 !important; }
+    .alert-danger { border-left-color: var(--accent-pink) !important; }
+    .alert-warning { border-left-color: #ffc107 !important; }
+    .alert-info { border-left-color: #17a2b8 !important; }
+
+    .alert-icon { font-size: 1.2rem; }
+    .alert-success .alert-icon { color: #28a745; }
+    .alert-danger .alert-icon { color: var(--accent-pink); }
+
+    .btn-close { filter: invert(1); opacity: 0.8; }
+
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Responsive cho mobile */
+    @media (max-width: 576px) {
+        .message-holder {
+            left: 20px;
+            right: 20px;
+            max-width: none;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.custom-alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 3000);
+    });
+</script>
 {% endif %}

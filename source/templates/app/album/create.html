@@ -1,48 +1,92 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}Create Album 🎵{% endblock %}
+{% block title %}Create Album | QT-M4U{% endblock %}
 
 {% block content %}
-
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-lg-6 col-md-8">
+            
+            <!-- Header Title -->
+            <div class="text-center mb-4">
+                <h2 class="display-6 fw-bold text-white">
+                    <i class="bi bi-folder-plus text-pink me-2"></i>Create New Album
+                </h2>
+                <p class="text-secondary">Organize your favorite tracks into a personal collection</p>
+            </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header text-black" style="background-color: pink;">
-                    <h4 class="mb-0">Create New Album</h4>
-                </div>
-
-                <div class="card-body">
-                    <form method="post">
+            <!-- Form Card -->
+            <div class="card bg-dark border-0 shadow-lg rounded-4 overflow-hidden shadow-pink-glow">
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" class="needs-validation">
                         {% csrf_token %}
 
-                        <!-- Album Name -->
-                        <div class="mb-3">
-                            {{ form.name.label_tag }}
-                            {{ form.name }}
-                            {% if form.name.errors %}
-                            <div class="text-danger">{{ form.name.errors }}</div>
-                            {% endif %}
-                        </div>
+                        <!-- Album Name Input -->
+                        <div class="mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label text-white fw-bold">
+                                <i class="bi bi-pencil-square me-1"></i> Album Name
+                            </label>
 
-                        <!-- Songs Checkboxes -->
-                        <label class="form-label">Select Songs</label>
-                        <div class="mb-3">
-                            {% for checkbox in form.songs %}
-                            <div class="form-check">
-                                {{ checkbox.tag }}
-                                <label class="form-check-label">{{ checkbox.choice_label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-black border-secondary text-pink"><i class="bi bi-collection"></i></span>
+                                {{ form.name }}
                             </div>
-                            {% endfor %}
-                            {% if form.songs.errors %}
-                            <div class="text-danger">{{ form.songs.errors }}</div>
+                            
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
                             {% endif %}
                         </div>
 
-                        <button type="submit" class="btn btn-outline-success w-100">➕ Create</button>
+                        <!-- Songs Selection Section -->
+                        <div class="mb-4">
+                            <label class="form-label text-white fw-bold mb-3">
+                                <i class="bi bi-music-note-list me-1"></i> Select Songs for Album
+                            </label>
+                            
+                            <!-- Custom Scrollable Container for Songs -->
+                            <div class="song-selector-container rounded-3 p-3 bg-black border border-secondary border-opacity-25" 
+                                 style="max-height: 300px; overflow-y: auto;">
+                                
+                                {% if form.songs %}
+                                    {% for checkbox in form.songs %}
+                                    <div class="form-check custom-checkbox py-2 border-bottom border-secondary border-opacity-10">
+                                        {{ checkbox.tag }}
+                                        <label class="form-check-label text-secondary ms-2 w-100 cursor-pointer" for="{{ checkbox.id_for_label }}">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center py-4 text-muted">
+                                        <i class="bi bi-info-circle me-1"></i> No songs available to add.
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if form.songs.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.songs.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-3 mt-5">
+                            <button class="btn btn-pink rounded-pill py-3 fw-bold shadow d-flex align-items-center justify-content-center" type="submit">
+                                <i class="bi bi-check-circle-fill me-2"></i> Confirm
+                            </button>
+                            
+                            <a href="{% url 'albums' %}" class="btn btn-outline-light rounded-pill py-2 fw-bold">
+                                <i class="bi bi-arrow-left me-2"></i> Cancel
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -51,4 +95,55 @@
     </div>
 </div>
 
+<style>
+    /* Styling for the input fields */
+    input[type="text"], .form-control {
+        background-color: #000 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        padding: 12px;
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+        border-color: var(--accent-pink) !important;
+        box-shadow: 0 0 0 0.25 margin-bottom: 2rem;rgba(255, 45, 85, 0.25) !important;
+    }
+
+    /* Custom Checkbox Styling */
+    .form-check-input {
+        background-color: #1a1a1a;
+        border-color: #ff2d55;
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: #ff2d55;
+        border-color: #ff2d55;
+    }
+
+    .custom-checkbox:hover {
+        background: rgba(255, 45, 85, 0.05);
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Scrollbar for song list */
+    .song-selector-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .song-selector-container::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 10px;
+    }
+    .song-selector-container::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-pink);
+    }
+
+    .shadow-pink-glow {
+        box-shadow: 0 10px 40px rgba(255, 45, 85, 0.15) !important;
+    }
+</style>
 {% endblock %}

@@ -1,63 +1,66 @@
-<!-- Search Section -->
-<div class="container pt-5">
-    <div class="card-body">
-        <form method="get" action="{% url 'search' %}" class="row g-3 align-items-end justify-content-center">
-            <!-- Search Input -->
-            <div class="col-lg-4 col-md-5 col-12">
-                <label for="searchInput" class="form-label fw-semibold">
+<div class="container mt-5 mb-5">
+    <div class="p-4 rounded-4 shadow bg-black">
+        <form action="{% url 'search' %}" class="row g-3 align-items-end justify-content-center" method="get">
+            <div class="col-lg-5 col-md-5 col-12">
+                <label class="form-label fw-bold text-pink" for="searchInput">
                     <i class="bi bi-search-heart"></i> Search
                 </label>
                 
-                <input type="text" class="form-control" id="searchInput" name="query"
-                    placeholder="Enter Song title or Artist" value="{{ query }}">
+                <input class="form-control rounded-pill bg-dark text-white border-secondary shadow-none custom-focus" 
+                       id="searchInput" name="query" placeholder="Enter Song title or Artist"
+                       type="text" value="{{ query }}">
             </div>
 
-            <!-- Genre Filter -->
-            <div class="col-lg-3 col-md-4 col-12">
-                <label for="genreSelect" class="form-label fw-semibold">
-                    <i class="bi bi-funnel"></i> Filter by Genre
+            <div class="col-lg-4 col-md-4 col-12">
+                <label class="form-label fw-bold text-pink" for="genreSelect">
+                    <i class="bi bi-funnel"></i> Genre
                 </label>
 
-                <select class="form-select" id="genreSelect" name="genre">
+                <select class="form-select rounded-pill bg-dark text-white border-secondary shadow-none custom-focus" 
+                        id="genreSelect" name="genre">
                     <option value="">All Genres</option>
-
                     {% for genre in genres %}
                     <option value="{{ genre.id }}" {% if genre.id|stringformat:"s" == selected_genre %}selected{% endif %}>
                         {{ genre.name }}
                     </option>
                     {% endfor %}
-
                 </select>
             </div>
 
-            <!-- Search Button -->
             <div class="col-lg-2 col-md-3 col-6 d-grid">
-                <button type="submit" class="btn text-black" style="background-color: pink;">
-                    Search <i class="bi bi-search-heart"></i>
+                <button class="btn btn-pink rounded-pill fw-bold" type="submit">
+                    Search
                 </button>
             </div>
         </form>
 
-        <!-- Clear Button (when has filters) -->
         {% if query or selected_genre %}
         <div class="text-center mt-3">
-            <a href="{% url 'index' %}" class="btn btn-outline-danger">
-                Clear Filters
+            <a class="btn btn-sm btn-outline-info rounded-pill py-2 px-4 transition-base" href="{% url 'index' %}">
+                <i class="bi bi-x-circle me-1"></i> Clear Filters
             </a>
         </div>
         {% endif %}
-
     </div>
-
-    <hr class="my-4 border-secondary">
 </div>
 
-
 <style>
-    @media (max-width: 576px) {
-        .form-control,
-        .form-select {
-            font-size: 16px;
+    .custom-focus:focus {
+        border-color: var(--accent-pink) !important;
+        background-color: #111 !important;
+        box-shadow: 0 0 8px rgba(255, 133, 162, 0.3) !important;
+        color: white !important;
+    }
+    
+    .form-select option {
+        background-color: #000;
+        color: white;
+    }
+
+    @media (max-width: 767.98px) {
+        .btn-pink {
+            padding-top: 10px;
+            padding-bottom: 10px;
         }
     }
 </style>

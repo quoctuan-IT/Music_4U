@@ -1,152 +1,206 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}{{ artist.name }} - Artist{% endblock %}
+{% block title %}{{ artist.name }} | Profile{% endblock %}
 
 {% block content %}
 
-<!-- Messages -->
-{% include 'partials/message.html' %}
+{% include 'partials/search_card.html' %}
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <!-- Artist Profile -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-lg border-0 bg-dark text-white">
-
+<div class="artist-header position-relative py-4 rounded-2" style="background: linear-gradient(180deg, rgba(255, 0, 155, 0.2) 0%, rgba(0,0,0,1) 100%);">
+    <div class="container py-2">
+        <div class="row align-items-center border-0">
+            <div class="col-md-3 text-center mb-4 mb-md-0">
                 {% if artist.image %}
-                <img src="{{ artist.image.url }}" class="card-img-top img-fluid w-100 artist-img-detail"
-                    alt="{{ artist.name }}">
+                <img src="{{ artist.image.url }}" class="rounded-circle shadow-lg border border-3 border-pink img-fluid artist-profile-img" style="width: 220px; height: 220px; object-fit: cover;">
                 {% else %}
-                <img src="{% static 'images/logo-IT.png' %}" class="card-img-top img-fluid w-100 artist-img-detail"
-                    alt="No Image">
+                <img src="{% static 'images/logo-IT.png' %}" class="rounded-circle shadow-lg border border-3 border-pink img-fluid" style="width: 220px; height: 220px; object-fit: cover;">
                 {% endif %}
+            </div>
 
-                <div class="card-body">
-                    <h2 class="card-title">{{ artist.name }}</h2>
-                    <p class="card-text">
-
-                        {% if artist.bio %}
+            <div class="col-md-9">
+                <span class="badge btn-pink mb-2"><i class="bi bi-patch-check-fill me-1"></i>Verified Artist</span>
+                <h1 class="display-3 fw-bold text-white mb-3">{{ artist.name }}</h1>
+                
+                <div class="artist-bio text-secondary mb-4" style="max-width: 700px;">
+                    {% if artist.bio %}
                         {{ artist.bio }}
-                        {% else %}
-                        <span class="text-muted">No bio available</span>
-                        {% endif %}
+                    {% else %}
+                        No bio.
+                    {% endif %}
+                </div>
 
-                    </p>
+                <div class="d-flex gap-3">
+                    {% if songs %}
+                    <button class="btn btn-pink rounded-pill px-3 fw-bold shadow" onclick="playAllSongs()">
+                        <i class="bi bi-play-fill fs-5 me-2"></i>Play All
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
-
-
     </div>
+</div>
 
+<div class="container pb-5">
     {% if songs %}
-    <div class="mb-4 d-flex justify-content-center">
-        <button class="btn btn-outline-primary" onclick="playAllSongs()">▶️ PLAY All</button>
-    </div>
-    <!-- Now Playing Section -->
-    {% include 'partials/music_player.html' %}
-
-    <!-- Song List -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header text-black"
-            style="background-color: pink;">
-            <h5 class="mb-0">
-                <i class="bi bi-music-note-list"></i> {{ artist.name }}
-            </h5>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h4 class="text-white mb-0 fw-bold">Popular Tracks</h4>
+                <span class="text-secondary small">{{ songs|length }} Songs</span>
+            </div>
+            
+            <div class="song-list-container rounded-4 overflow-hidden border border-secondary border-opacity-25 shadow-sm">
+                {% for song in songs %}
+                    {% include 'partials/song_list.html' %}
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="list-group list-group-flush" id="songList">
-
-            {% for song in songs %}
-            {% include 'partials/song_list.html' %}
-            {% endfor %}
-
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+                {% include 'partials/music_player.html' %}
+            </div>
         </div>
     </div>
     {% else %}
-    <div class="text-center py-2">
-        <h4 class="mb-3">No Songs found</h4>
-        <p class="mb-4">This artist hasn't uploaded any songs yet!</p>
-        <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg">
-            <i class="fas fa-search me-2"></i>Discover Music
+    <div class="text-center py-5 mt-5 border-0">
+        <i class="bi bi-music-note-list text-secondary display-1 mb-3"></i>
+        <h3 class="text-white">Music is on the way</h3>
+        <p class="text-secondary">This artist hasn't uploaded any tracks yet.</p>
+        <a class="btn btn-outline-pink rounded-pill px-3" href="{% url 'artists' %}">
+            <i class="bi bi-arrow-left me-2"></i> Artists
         </a>
     </div>
     {% endif %}
-
 </div>
 
-
 <script>
+    // JS for Songs
     const songs = [
         {% for song in songs %}
-    {
-        title: "{{ song.title|escapejs }}",
-            artist: "{{ song.artist|escapejs }}",
-                url: "{{ song.audio_file.url }}"
-    },
-    {% endfor %}
+        {
+            id: "{{ song.id }}",
+            title: "{{ song.title|escapejs }}",
+            artist: "{{ song.artist.name|escapejs }}",
+            url: "{{ song.audio_file.url }}",
+            cover: "{% if song.cover_image %}{{ song.cover_image.url }}{% else %}{% static 'images/logo-IT.png' %}{% endif %}"
+        },
+        {% endfor %}
     ];
 
     let currentIndex = 0;
     const player = document.getElementById("audioPlayer");
-    const nowPlaying = document.getElementById("nowPlaying");
-    const songList = document.querySelectorAll(".song-item");
+    const nowPlayingText = document.getElementById("nowPlaying");
+    const playerCover = document.getElementById("playerCover");
+    const songItems = document.querySelectorAll(".song-item");
 
-    function highlightCurrentSong() {
-        songList.forEach(item => item.classList.remove("bg-black", "text-white"));
-        if (songList[currentIndex]) {
-            songList[currentIndex].classList.add("bg-black", "text-white");
-        }
+    function playSong(index) {
+        if (index < 0 || index >= songs.length) return;
+        currentIndex = index;
+        const song = songs[currentIndex];
+        
+        player.src = song.url;
+        player.play();
+        updateUI();
     }
 
     function playAllSongs() {
-        if (songs.length === 0) return;
-
-        currentIndex = 0;
-        player.src = songs[currentIndex].url;
-        player.play();
-        updateNowPlaying();
-        highlightCurrentSong();
+        if (songs.length > 0) playSong(0);
     }
 
     function playNextSong() {
-        currentIndex++;
-        if (currentIndex < songs.length) {
-            player.src = songs[currentIndex].url;
-            player.play();
-            updateNowPlaying();
-            highlightCurrentSong();
+        if (currentIndex < songs.length - 1) {
+            playSong(currentIndex + 1);
         } else {
-            nowPlaying.innerText = "All songs played.";
+            playSong(0); // Loop back
         }
     }
 
     function playPreviousSong() {
-        if (songs.length === 0) return;
-        currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-        player.src = songs[currentIndex].url;
-        player.play();
-        updateNowPlaying();
-        highlightCurrentSong();
-    }
-
-    function togglePlay() {
-        if (player.paused) {
-            player.play();
+        if (currentIndex > 0) {
+            playSong(currentIndex - 1);
         } else {
-            player.pause();
+            playSong(songs.length - 1);
         }
     }
 
-    function updateNowPlaying() {
-        nowPlaying.innerText = `🎧 ${songs[currentIndex].title} - ${songs[currentIndex].artist}`;
+    function togglePlay() {
+        if (player.src) {
+            player.paused ? player.play() : player.pause();
+        } else {
+            playAllSongs();
+        }
     }
 
-    // Auto play next song
+    // JS for UI
+    const progressBar = document.getElementById("progressBar");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationTimeEl = document.getElementById("durationTime");
+    const playIcon = document.getElementById("playIcon");
+    const nowArtistText = document.getElementById("nowArtist");
+
+    function updateUI() {
+        const song = songs[currentIndex];
+        nowPlayingText.innerText = song.title;
+        nowArtistText.innerText = song.artist;
+        if (playerCover) playerCover.src = song.cover;
+        
+        songItems.forEach(item => item.classList.remove("active-song"));
+        const currentItem = document.querySelector(`[data-index="${currentIndex}"]`);
+        if (currentItem) {
+            currentItem.classList.add("active-song");
+        }
+    }
+
+    // Rotate Animation and Icon Play/Pause
+    player.onplay = () => {
+        playerCover.style.animationPlayState = "running";
+        playIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+    };
+
+    player.onpause = () => {
+        playerCover.style.animationPlayState = "paused";
+        playIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    };
+
+    // Update Progress Bar
+    player.ontimeupdate = () => {
+        if (player.duration) {
+            const per = (player.currentTime / player.duration) * 100;
+            progressBar.value = per;
+            
+            currentTimeEl.innerText = formatTime(player.currentTime);
+            durationTimeEl.innerText = formatTime(player.duration);
+        }
+    };
+
+    // Skip on Progress Bar
+    progressBar.oninput = () => {
+        const seekTime = (progressBar.value / 100) * player.duration;
+        player.currentTime = seekTime;
+    };
+
+    function formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' + sec : sec}`;
+    }
+
     player.onended = playNextSong;
 </script>
 
-
+<style>
+    .active-song {
+        background: rgba(255, 45, 85, 0.15) !important;
+        border-left: 4px solid var(--accent-pink) !important;
+    }
+    .artist-profile-img {
+        transition: transform 0.5s ease;
+    }
+    .artist-profile-img:hover {
+        transform: scale(1.05);
+    }
+</style>
 {% endblock %}

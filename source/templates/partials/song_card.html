@@ -1,107 +1,104 @@
 {% load static %}
 
-<!-- Song Card -->
 <div class="col">
-    <div class="card h-100 shadow-sm border-0 song-card">
-        <!-- Cover Image -->
-        <div class="position-relative overflow-hidden">
+    <div class="card h-100 bg-transparent border-0 song-card">
+        <div class="position-relative overflow-hidden rounded-4 shadow-lg group">
             <a href="{% url 'song_detail' song.id %}">
-
                 {% if song.cover_image %}
-                <img src="{{ song.cover_image.url }}" class="card-img-top" alt="{{ song.title }}"
-                    style="height: 200px; object-fit: cover;">
+                <img alt="{{ song.title }}" class="card-img-top song-img" src="{{ song.cover_image.url }}">
                 {% else %}
-                <img src="{% static 'images/logo-IT.png' %}" class="card-img-top" alt="Default cover"
-                    style="height: 200px; object-fit: cover;">
+                <img alt="Default cover" class="card-img-top song-img" src="{% static 'images/logo-IT.png' %}">
                 {% endif %}
-
             </a>
 
-            <!-- Play Button Overlay -->
-            <div class="position-absolute top-50 start-50 translate-middle play-overlay d-none">
-                <a class="btn btn-primary rounded-circle btn-lg" href="{% url 'song_detail' song.id %}">
-                    <i class="bi bi-play-fill"></i>
+            <div class="play-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                <a class="btn btn-pink rounded-circle shadow-lg btn-play-main" href="{% url 'song_detail' song.id %}">
+                    <i class="bi bi-play-fill fs-3"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Card Body -->
-        <div class="card-body d-flex flex-column">
-            <h6 class="card-title text-truncate mb-2" title="{{ song.title }}">
-                {{ song.title }}
+        <div class="card-body px-1 pt-3 pb-0">
+            <h6 class="card-title text-truncate fw-bold mb-1" title="{{ song.title }}">
+                <a href="{% url 'song_detail' song.id %}" class="text-white text-decoration-none hover-pink">{{ song.title }}</a>
             </h6>
-            <a class="card-text text-muted small text-truncate mb-2" title="{{ song.artist }}"
-                href="{% url 'artist_detail' song.artist.id %}">
-                <i class="bi bi-person me-1"></i>{{ song.artist }}
-            </a>
+            <p class="mb-2">
+                <a class="text-secondary small text-decoration-none hover-pink" href="{% url 'artist_detail' song.artist.id %}">
+                    <i class="bi bi-person me-1"></i>{{ song.artist }}
+                </a>
+            </p>
         </div>
 
-        <!-- Card Footer -->
-        <div class="card-footer bg-transparent border-0 pt-0">
-            <div class="d-flex gap-1">
-                <a class="btn btn-outline-primary btn-sm flex-fill" title="Play" href="{% url 'song_detail' song.id %}">
-                    <i class="bi bi-play-circle"></i>
+        <div class="card-footer bg-transparent border-0 px-1 pt-0 pb-2 mt-auto">
+            <div class="d-flex align-items-center justify-content-between">
+                <a href="{% url 'song_detail' song.id %}" class="btn btn-sm btn-dark rounded-pill px-3 border-secondary">
+                    <i class="bi bi-headphones me-1"></i> Play
                 </a>
-
+                
                 {% if user.is_authenticated %}
-                {% if song in user.favorite_songs.all %}
-                <button class="btn btn-outline-danger btn-sm flex-fill btn-favorite" data-song-id="{{ song.id }}"
-                    title="Remove from Favorites">❤️ Liked</button>
-                {% else %}
-                <button class="btn btn-outline-danger btn-sm flex-fill btn-favorite" data-song-id="{{ song.id }}"
-                    title="Add to Favorites">🤍 Like</button>
+                <button class="btn btn-sm btn-favorite rounded-circle border-0" 
+                        data-song-id="{{ song.id }}" 
+                        style="width: 32px; height: 32px; background: rgba(255,255,255,0.05);">
+                    {% if song in user.favorite_songs.all %}
+                    <i class="bi bi-heart-fill text-danger"></i>
+                    {% else %}
+                    <i class="bi bi-heart text-pink"></i>
+                    {% endif %}
+                </button>
                 {% endif %}
-                {% endif %}
-
             </div>
         </div>
-
     </div>
 </div>
 
-
 <style>
-    /* Song Card */
-    .song-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        cursor: pointer;
+    .song-img {
+        height: 220px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
     }
 
-    .song-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    .song-card:hover .song-img {
+        transform: scale(1.1);
+        filter: brightness(0.4);
+    }
+
+    .play-overlay {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background: rgba(0,0,0,0.2);
     }
 
     .song-card:hover .play-overlay {
-        display: block !important;
+        opacity: 1;
     }
 
-    .song-card:hover .card-img-top {
-        filter: brightness(0.8);
-        transition: filter 0.3s ease;
+    .btn-play-main {
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
     }
 
-    /* Image container */
-    .position-relative {
-        border-radius: calc(0.375rem - 1px) calc(0.375rem - 1px) 0 0;
+    .song-card:hover .btn-play-main {
+        transform: translateY(0);
     }
 
-    /* Responsive text sizing */
+    .hover-pink:hover {
+        color: var(--accent-pink) !important;
+    }
+
+    .btn-favorite:hover {
+        background: rgba(255, 45, 85, 0.2) !important;
+        transform: scale(1.1);
+    }
+
     @media (max-width: 576px) {
-        .card-title {
-            font-size: 0.95rem;
-        }
-
-        .song-card {
-            width: 350px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-    }
-
-    /* Button hover effects */
-    .btn-sm:hover {
-        transform: scale(1.05);
-        transition: transform 0.2s ease;
+        .song-img { height: 160px; }
+        .btn-play-main { width: 45px; height: 45px; }
+        .card-title { font-size: 0.9rem; }
     }
 </style>

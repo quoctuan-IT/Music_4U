@@ -1,99 +1,240 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}{{ song.title }} - {{ song.artist }} 🎵{% endblock %}
+{% block title %}{{ song.title }} - {{ song.artist.name }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+
+{% include 'partials/search_card.html' %}
+
+<div class="container py-2">
     <div class="row justify-content-center">
-        <div class="col-md-5">
+        <div class="col-lg-10">
+            <div class="card bg-transparent border-0 overflow-hidden shadow-lg" style="background: linear-gradient(180deg, rgba(255, 0, 155, 0.2) 0%, rgba(0,0,0,1) 100%);">
+                <div class="row g-0 align-items-center p-4">
+                    <div class="col-md-4 mb-4 mb-md-0 text-center">
+                        <div class="player-disc-wrapper d-inline-block position-relative">
+                            <div class="disc-hole"></div>
 
-            <!-- Song card -->
-            {% if song %}
-            <div class="card shadow-lg border-0 mb-4 bg-dark text-white">
-
-                {% if song.cover_image %}
-                <img src="{{ song.cover_image.url }}" class="card-img-top" alt="{{ song.title }}" height="300">
-                {% else %}
-                <img src="{% static 'images/Error.png' %}" class="card-img-top" alt="No Cover" height="300">
-                {% endif %}
-
-                <div class="card-body">
-                    <h2 class="card-title">{{ song.title }}</h2>
-                    <p class="card-text mb-2">
-                        <strong>Artist:</strong> {{ song.artist.name }} <br>
-                        
-                        <strong>Genre{% if song.genres.count > 1 %}s{% endif %}:</strong> 
-
-                        {% for genre in song.genres.all %}
-                            <span class="badge bg-primary me-1">{{ genre.name }}</span>
-                        {% empty %}
-                            <span class="text-muted">No genre</span>
-                        {% endfor %}
-
-                    </p>
-
-                    <!-- Audio player -->
-                    <div class="my-4">
-                        <audio controls autoplay class="w-100">
-                            <source src="{{ song.audio_file.url }}" type="audio/mpeg">
-                        </audio>
+                            {% if song.cover_image %}
+                            <img id="detailCover" alt="{{ song.title }}" class="img-fluid rounded-circle shadow-lg border border-5 border-white rotate-anim" 
+                                 src="{{ song.cover_image.url }}" style="aspect-ratio: 1/1; object-fit: cover; width: 100%; max-width: 260px;">
+                            {% else %}
+                            <img id="detailCover" alt="No Cover" class="img-fluid rounded-circle shadow-lg border border-5 border-white rotate-anim" 
+                                 src="{% static 'images/logo-IT.png' %}" style="aspect-ratio: 1/1; object-fit: cover; width: 100%; max-width: 260px;">
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        {% if song in user.favorite_songs.all %}
-                        <button class="btn btn-light btn-favorite" data-song-id="{{ song.id }}">❤️ Liked</button>
-                        {% else %}
-                        <button class="btn btn-outline-light btn-favorite" data-song-id="{{ song.id }}">🤍 Like</button>
-                        {% endif %}
+                    <div class="col-md-8 ps-md-5">
+                        <h1 class="display-5 fw-bold text-white mb-2">{{ song.title }}</h1>
+                        <h4 class="mb-4">
+                            <a href="{% url 'artist_detail' song.artist.id %}" class="text-pink text-decoration-none hover-white">
+                                {{ song.artist.name }}
+                            </a>
+                        </h4>
 
-                    <div class="text-muted small text-end my-2">
-                        Uploaded by: {{ song.uploaded_by.username }} on {{ song.created_at|date:"d/m/Y" }}
-                    </div>
-                    </div>
+                        <div class="mb-4">
+                            {% for genre in song.genres.all %}
+                            <span class="badge rounded-pill border border-secondary text-secondary me-2 p-2 px-3">#{{ genre.name }}</span>
+                            {% empty %}
+                            <span class="text-muted small">No genre assigned</span>
+                            {% endfor %}
+                        </div>
 
+                        <div class="audio-player-detail p-3 rounded-4 border border-dark-subtle shadow-pink-glow mb-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <button class="btn btn-pink rounded-circle d-flex align-items-center justify-content-center shadowplay flex-shrink-0" 
+                                        id="detailPlayBtn" style="width: 35px; height: 35px; transition: transform 0.2s;">
+                                    <i class="bi bi-play-fill fs-4" id="detailPlayIcon"></i>
+                                </button>
+                                
+                                <div class="flex-grow-1">
+                                    <input type="range" class="form-range custom-range" id="detailProgress" value="0" min="0" max="100">
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <span id="detailCurrent" class="small">0:00</span>
+                                        <span id="detailDuration" class="small">0:00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <audio id="detailAudio" autoplay>
+                                <source src="{{ song.audio_file.url }}" type="audio/mpeg">
+                            </audio>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3">
+                            {% if user.is_authenticated %}
+                            <button class="btn btn-favorite border border-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                                    data-song-id="{{ song.id }}" style="width: 40px; height: 40px;">
+                                {% if song in user.favorite_songs.all %}
+                                <i class="bi bi-heart-fill text-danger"></i>
+                                {% else %}
+                                <i class="bi bi-heart text-pink"></i>
+                                {% endif %}
+                            </button>
+                            {% endif %}
+                            
+                            <div class="text-secondary small">
+                                <i class="bi bi-cloud-arrow-up me-1"></i> {{ song.uploaded_by.username }} 
+                                <span class="mx-2">|</span>
+                                <i class="bi bi-calendar-event me-1"></i> {{ song.created_at|date:"M d, Y" }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% endif %}
 
-            {% if user.is_authenticated %}
-            <!-- Form add Song to Album -->
-            <div class="card bg-dark mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <i class="bi bi-folder-plus"></i> Add to Album
-                    </h5>
+            <div class="row mt-5">
+                <div class="col-md-4 mb-4">
+                    {% if user.is_authenticated %}
+                    <div class="p-4 rounded-3 bg-dark border border-secondary border-opacity-25 shadow-sm mb-4">
+                        <h5 class="text-pink fw-bold mb-3">
+                            <i class="bi bi-plus-square-dotted text-pink me-2"></i>Save to Album
+                        </h5>
 
-                    <form method="POST" action="{% url 'song_to_album' song.id %}">
-                        {% csrf_token %}
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-8">
-                                <select class="form-select" name="album_id" required>
-
+                        <form action="{% url 'song_to_album' song.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <select class="form-select bg-black text-white border-secondary custom-focus rounded-start-pill" name="album_id" required>
+                                    <option value="" disabled selected>Choose an album</option>
                                     {% for album in albums %}
                                     <option value="{{ album.id }}">{{ album.name }}</option>
                                     {% empty %}
-                                    <option disabled>No albums available</option>
+                                    <option disabled>No albums found</option>
                                     {% endfor %}
-
                                 </select>
-                            </div>
 
-                            <div class="col-md-4 text-end">
-                                <button type="submit" class="btn btn-outline-success">
-                                    <i class="bi bi-folder-plus"></i> Add
+                                <button class="btn btn-pink rounded-end-pill px-4" type="submit">
+                                    <i class="bi bi-plus-square-dotted"></i>
                                 </button>
                             </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-8">
+                    <div class="p-4 rounded-3 bg-dark border border-secondary border-opacity-25 h-100 shadow-sm">
+                        <h5 class="text-pink fw-bold border-bottom border-secondary border-opacity-25 pb-2">
+                            <i class="bi bi-card-text me-2"></i>Lyrics
+                        </h5>
+
+                        <div class="lyrics-container text-secondary lh-lg" style="white-space: pre-line; font-style: italic;">
+                            {% if song.lyrics %}
+                                {{ song.lyrics }}
+                            {% else %}
+                                Lyrics updating.
+                            {% endif %}
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-            {% endif %}
-            
-            {% include 'partials/message.html' %}
         </div>
     </div>
 </div>
 
+<style>
+    .hover-white:hover { color: white !important; transition: 0.3s; }
+    
+    .lyrics-container {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    .lyrics-container::-webkit-scrollbar { width: 4px; }
+    .lyrics-container::-webkit-scrollbar-thumb { background: #ff3e95; border-radius: 10px; }
+
+    .player-disc-wrapper {
+        position: relative;
+    }
+
+    .disc-hole {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        background: #000000;
+        border-radius: 50%;
+        z-index: 10;
+        border: 3px solid rgb(255, 255, 255);
+    }
+
+    .rotate-anim {
+        animation: rotateContinuous 10s linear infinite;
+        animation-play-state: paused;
+        transition: border 0.3s ease;
+    }
+
+    @keyframes rotateContinuous {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .custom-range::-webkit-slider-runnable-track {
+        background: rgba(255, 255, 255, 0.3);
+        height: 6px;
+        border-radius: 3px;
+    }
+    .custom-range::-webkit-slider-thumb {
+        background: var(--accent-pink);
+        margin-top: -4px;
+        box-shadow: 0 0 8px var(--accent-pink);
+    }
+
+    #detailPlayBtn:active { transform: scale(0.92); }
+    .shadow-pink-glow { box-shadow: 0 10px 40px rgba(255, 45, 155, 0.2) !important; }
+</style>
+
+<script>
+    const audio = document.getElementById('detailAudio');
+    const playBtn = document.getElementById('detailPlayBtn');
+    const playIcon = document.getElementById('detailPlayIcon');
+    const progress = document.getElementById('detailProgress');
+    const currTimeEl = document.getElementById('detailCurrent');
+    const durTimeEl = document.getElementById('detailDuration');
+    const coverImg = document.getElementById('detailCover');
+
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' + sec : sec}`;
+    }
+
+    playBtn.onclick = () => {
+        audio.paused ? audio.play() : audio.pause();
+    };
+
+    audio.onplay = () => {
+        playIcon.classList.replace('bi-play-fill', 'bi-pause-fill');
+        coverImg.style.animationPlayState = "running";
+    };
+
+    audio.onpause = () => {
+        playIcon.classList.replace('bi-pause-fill', 'bi-play-fill');
+        coverImg.style.animationPlayState = "paused";
+    };
+
+    audio.ontimeupdate = () => {
+        if (audio.duration) {
+            const per = (audio.currentTime / audio.duration) * 100;
+            progress.value = per;
+            currTimeEl.innerText = formatTime(audio.currentTime);
+            durTimeEl.innerText = formatTime(audio.duration);
+        }
+    };
+
+    progress.oninput = () => {
+        const seek = (progress.value / 100) * audio.duration;
+        audio.currentTime = seek;
+    };
+
+    audio.onloadedmetadata = () => {
+        durTimeEl.innerText = formatTime(audio.duration);
+    };
+</script>
 {% endblock %}

@@ -1,94 +1,39 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block title %}Artists{% endblock %}
 
 {% block content %}
 
-<div class="container">
-    <div class="mb-4">
-        <p class="display-6 fw-bold text-center">
-            <i class="bi bi-person-fill"></i> Artists
-        </p>
+{% include 'partials/search_card.html' %}
+
+<div class="container pb-4">
+    <div class="mb-5">
+        <h2 class="display-6 fw-bold text-center text-pink text-uppercase tracking-wider">
+            <i class="bi bi-people-fill"></i> Discover Artists
+        </h2>
+        <div class="mx-auto" style="width: 60px; height: 3px; background: var(--bs-primary);"></div>
     </div>
 
-    <!-- Song Grid Container -->
     {% if artists %}
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
         {% for artist in artists %}
-        {% include 'partials/artist_card.html' %}
+            {% include 'partials/artist_card.html' %}
         {% endfor %}
-
     </div>
     {% else %}
-
-    <!-- Empty State -->
-    <div class="text-center py-5">
+    <div class="text-center py-5 rounded-0">
         <div class="mb-4">
-            <i class="bi bi-music-note-list" style="font-size: 4rem; color: #6c757d;"></i>
+            <i class="bi bi-person-x text-secondary" style="font-size: 4rem;"></i>
         </div>
-        <h4 class="text-muted mb-3">No Artists Found</h4>
-        <p class="text-muted mb-4">Try adjusting your search criteria or browse our music collection.</p>
-        <a href="{% url 'index' %}" class="btn btn-primary">
-            <i class="bi bi-arrow-left me-2"></i>Back to Home
+
+        <h4 class="text-white mb-2">No Artists Found</h4>
+        <p class="text-secondary mb-4">We couldn't find any artists.</p>
+
+        <a class="btn btn-outline-pink rounded-pill px-4" href="{% url 'index' %}">
+            <i class="bi bi-arrow-left me-2"></i> Home
         </a>
     </div>
     {% endif %}
-
 </div>
-
-
-<style>
-    /* Artist Card Hover Effects */
-    .artist-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        cursor: pointer;
-    }
-
-    .artist-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .artist-card:hover .play-overlay {
-        display: block !important;
-    }
-
-    .artist-card:hover .card-img-top {
-        filter: brightness(0.8);
-        transition: filter 0.3s ease;
-    }
-
-    /* Image container */
-    .position-relative {
-        border-radius: calc(0.375rem - 1px) calc(0.375rem - 1px) 0 0;
-    }
-
-    /* Responsive text sizing */
-    @media (max-width: 576px) {
-        .card-title {
-            font-size: 0.95rem;
-        }
-
-        .card-text {
-            font-size: 0.85rem;
-        }
-
-        .artist-card {
-            width: 250px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-    }
-
-    /* Button hover effects */
-    .btn-sm:hover {
-        transform: scale(1.05);
-        transition: transform 0.2s ease;
-    }
-</style>
-
-
 {% endblock %}

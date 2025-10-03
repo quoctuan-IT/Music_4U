@@ -1,11 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
-from django import forms
-from django.db import models
 
 from .models import Song, Album, Genre, Artist
-
 
 # Register your models here.
 admin.site.register(Song)

@@ -1,63 +1,112 @@
-<div class="list-group-item song-item border" data-index="{{ forloop.counter0 }}">
-    <div class="row align-items-center g-3">
-
-        <!-- Song Number -->
-        <div class="col-auto d-none d-md-block">
-            <span class="fw-bold">{{ forloop.counter }}</span>
+<div class="list-group-item song-item bg-dark border-0 border-bottom border-secondary border-opacity-10 py-2 py-md-3 px-3 px-md-4 transition-base"
+    data-index="{{ forloop.counter0 }}" onclick="playSong({{ forloop.counter0 }})">
+    <div class="row align-items-center g-2 g-md-3">
+        
+        <div class="col-auto d-none d-md-block text-center" style="width: 35px;">
+            <span class="text-secondary small fw-bold song-index">{{ forloop.counter }}</span>
+            <i class="bi bi-play-fill text-pink d-none play-icon"></i>
         </div>
 
-        <!-- Cover Image -->
-        <a class="col-auto" href="{% url 'song_detail' song.id %}">
-            <img src="{{ song.cover_image.url }}" alt="{{ song.title }}" class="rounded" width="60" height="60">
-        </a>
-
-        <!-- Song Info -->
-        <a class="col" href="{% url 'song_detail' song.id %}">
-            <div class="fw-semibold">{{ song.title }}</div>
-            <small>{{ song.artist }}</small>
-        </a>
-
-        {% if favorite_songs or songs %}
-        <!-- Favorite Button -->
         <div class="col-auto">
-            <button class="btn btn-outline-danger btn-sm btn-favorite" data-song-id="{{ song.id }}">
-                ❤️ Liked
-            </button>
+            <div class="position-relative artwork-container">
+                <img src="{{ song.cover_image.url }}" class="rounded shadow-sm"
+                    style="width: 48px; height: 48px; object-fit: cover;">
+                <div class="artwork-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded">
+                    <i class="bi bi-play-fill text-white fs-4"></i>
+                </div>
+            </div>
         </div>
-        {% else %}
-        <!-- Remove Song to Album Button -->
-        <div class="col-auto">
-            <a class="btn btn-outline-danger btn-sm" href="{% url 'album_remove_song' album.id song.id %}"
-                onclick="return confirm('Are you sure to remove this song?')">
-                <i class="bi bi-x-circle"></i> Remove
-            </a>
-        </div>
-        {% endif %}
 
+        <div class="col overflow-hidden">
+            <div class="text-white fw-bold text-truncate mb-0 song-title">{{ song.title }}</div>
+            <div class="text-secondary small text-truncate">{{ song.artist.name }}</div>
+        </div>
+
+        <div class="col-auto">
+            <div class="d-flex align-items-center gap-2 gap-md-4">
+                
+                <button class="btn btn-link text-secondary p-1 btn-favorite shadow-none" 
+                        data-song-id="{{ song.id }}">
+                    {% if song in user.favorite_songs.all %}
+                        <i class="bi bi-heart-fill text-danger"></i>
+                    {% else %}
+                        <i class="bi bi-heart text-pink"></i>
+                    {% endif %}
+                </button>
+
+                <a class="btn btn-link text-info p-1 d-md-inline-block shadow-none" 
+                   href="{% url 'song_detail' song.id %}" 
+                   onclick="event.stopPropagation();">
+                    <i class="bi bi-info-circle hover-white scale-up"></i>
+                </a>
+
+                {% if album %}
+                <!-- Button Remove Song to Album -->
+                <a class="btn btn-link text-danger p-1 shadow-none"
+                    href="{% url 'album_remove_song' album.id song.id %}"
+                    onclick="return confirm('Are you sure to remove this song?')">
+                    <i class="bi bi-trash scale-up"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 
-
 <style>
-    a {
-        text-decoration: none;
-        color: white;
+    /* Base item style */
+    .song-item {
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+        border-radius: 8px;
     }
 
     .song-item:hover {
-        cursor: pointer;
-        background-color: black;
+        background: rgba(255, 255, 255, 0.08) !important;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 576px) {
-        .d-flex.justify-content-between {
-            flex-direction: column;
-            align-items: stretch !important;
-        }
+    .song-item:active {
+        transform: scale(0.995);
+    }
 
-        .btn {
-            width: 100%;
+    /* Artwork Overlay logic */
+    .artwork-container .artwork-overlay {
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .song-item:hover .artwork-overlay {
+        opacity: 1;
+    }
+
+    /* Text & Icon Effects */
+    .hover-pink:hover { color: var(--accent-pink) !important; }
+    .hover-white:hover { color: #fff !important; }
+    .text-pink { color: var(--accent-pink) !important; }
+    
+    .scale-up {
+        display: inline-block;
+        animation: heartBeat 0.3s ease;
+    }
+
+    @keyframes heartBeat {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+    }
+
+    /* Playing state simulation */
+    .song-item.is-playing .song-index { display: none; }
+    .song-item.is-playing .play-icon { display: block; }
+    .song-item.is-playing .song-title { color: var(--accent-pink) !important; }
+
+    /* Responsive Spacing */
+    @media (max-width: 768px) {
+        .song-item {
+            margin-bottom: 2px;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
         }
     }
 </style>

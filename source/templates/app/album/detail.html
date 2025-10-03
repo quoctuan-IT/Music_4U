@@ -1,140 +1,228 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}Album - {{ album.name }}{% endblock %}
+{% block title %}Album: {{ album.name }}{% endblock %}
 
 {% block content %}
+<!-- Album Hero Header -->
+<div class="album-header position-relative mt-5 rounded-2" style="background: linear-gradient(180deg, rgba(255, 0, 155, 0.2) 0%, rgba(0,0,0,1) 100%);">
+    <div class="container py-5">
+        <div class="row align-items-end">
+            <!-- Album Cover -->
+            <div class="col-md-4 col-lg-3 text-center mb-4 mb-md-0">
+                <div class="position-relative d-inline-block shadow-lg rounded-4 overflow-hidden shadow-pink-glow">
+                    {% if album.songs.first.cover_image %}
+                    <img src="{{ album.songs.first.cover_image.url }}" class="img-fluid album-main-img" style="width: 280px; aspect-ratio: 1/1; object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'images/logo-IT.png' %}" class="img-fluid album-main-img" style="width: 280px; aspect-ratio: 1/1; object-fit: cover;">
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Album Info -->
+            <div class="col-md-8 col-lg-9 ps-md-5">
+                <span class="badge btn-pink mb-2 text-uppercase fw-bold p-2 px-3 rounded-pill">Personal Album</span>
+                <h1 class="display-5 fw-bold text-white mb-2">{{ album.name }}</h1>
+                
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="d-flex align-items-center text-white">
+                        <i class="bi bi-person-circle fs-5 me-2 text-pink"></i>
+                        <span class="fw-semibold">{{ user.username }}</span>
+                    </div>
+                    <span class="text-secondary">|</span>
+                    <span class="text-secondary fw-bold">{{ album.songs.count }} Tracks</span>
+                </div>
 
-<!-- Messages -->
-{% include 'partials/message.html' %}
-
-<div class="container py-2">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <div>
-            <h2 class="fw-bold mb-1">
-                <i class="bi bi-music-note-beamed"></i> Album: {{ album.name }}
-            </h2>
-            <p class="mb-0">Saved by
-                <i class="bi bi-person-circle"></i>
-                <strong>{{ user.username }}</strong>
-            </p>
-        </div>
-
-        <div class="col-lg-2 col-md-3 col-6">
-
-            {% if album.songs.all %}
-            <button class="btn btn-outline-primary" onclick="playAllSongs()">▶️ PLAY All</button>
-            {% endif %}
-
+                <div class="d-flex align-items-center gap-3">
+                    
+                    {% if album.songs.all %}
+                    <button class="btn btn-pink rounded-pill px-4 fw-bold shadow d-inline-flex align-items-center justify-content-center" 
+                            onclick="playAllSongs()" 
+                            style="height: 45px; min-width: 140px;">
+                        <i class="bi bi-play-fill fs-4 me-1"></i> Play All
+                    </button>
+                    {% endif %}
+                    
+                    <a href="{% url 'index' %}" 
+                    class="btn btn-outline-light rounded-pill px-4 fw-bold d-inline-flex align-items-center justify-content-center" 
+                    style="height: 45px; min-width: 140px;">
+                        <i class="bi bi-plus-lg me-2"></i> More
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
+<div class="container pb-5">
     {% if album.songs.all %}
-
-    <!-- Now Playing Section -->
-    {% include 'partials/music_player.html' %}
-
-    <!-- Song List -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header text-black" style="background-color: pink;">
-            <h5 class="mb-0">
-                <i class="bi bi-music-note-list"></i> Songs
-            </h5>
+    <div class="row g-4">
+        <!-- Tracklist -->
+        <div class="col-lg-8">
+            <h4 class="text-white mb-4 fw-bold"><i class="bi bi-music-note-list text-pink me-2"></i>Tracklist</h4>
+            <div class="song-list-container rounded-4 overflow-hidden border border-secondary border-opacity-25 shadow-sm">
+                {% for song in album.songs.all %}
+                    {% include 'partials/song_list.html' %}
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="list-group list-group-flush" id="songList">
-
-            {% for song in album.songs.all %}
-            {% include 'partials/song_list.html' %}
-            {% endfor %}
-
+        <!-- Floating Player -->
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+                {% include 'partials/music_player.html' %}
+            </div>
         </div>
     </div>
     {% else %}
     <!-- Empty State -->
-    <div class="text-center py-2">
-        <h4 class="mb-3">No Songs Yet</h4>
-        <p class="mb-4">Start adding songs to your Album to build your personal playlist!</p>
-        <a href="{% url 'index' %}" class="btn btn-outline-primary btn-lg">
-            <i class="bi bi-box-arrow-right"></i> Discover Music
+    <div class="text-center py-5 border-0">
+        <div class="mb-4">
+            <i class="bi bi-collection-play text-secondary display-1"></i>
+        </div>
+
+        <h3 class="text-white fw-bold">No music!</h3>
+        <p class="text-secondary mb-4">You haven't added any songs to Album <strong>{{ album.name }}</strong> yet.</p>
+
+        <a class="btn btn-outline-pink rounded-pill px-4" href="{% url 'profile' %}">
+            <i class="bi bi-arrow-left me-2"></i> Back
         </a>
     </div>
     {% endif %}
-
 </div>
 
-
 <script>
+    // JS for Songs
     const songs = [
         {% for song in album.songs.all %}
-    {
-        title: "{{ song.title|escapejs }}",
-            artist: "{{ song.artist|escapejs }}",
-                url: "{{ song.audio_file.url }}"
-    },
-    {% endfor %}
+        {
+            id: "{{ song.id }}",
+            title: "{{ song.title|escapejs }}",
+            artist: "{{ song.artist.name|escapejs }}",
+            url: "{{ song.audio_file.url }}",
+            cover: "{% if song.cover_image %}{{ song.cover_image.url }}{% else %}{% static 'images/logo-IT.png' %}{% endif %}"
+        },
+        {% endfor %}
     ];
 
     let currentIndex = 0;
     const player = document.getElementById("audioPlayer");
-    const nowPlaying = document.getElementById("nowPlaying");
-    const songList = document.querySelectorAll(".song-item");
+    const nowPlayingText = document.getElementById("nowPlaying");
+    const playerCover = document.getElementById("playerCover");
+    const songItems = document.querySelectorAll(".song-item");
 
-    function highlightCurrentSong() {
-        songList.forEach(item => item.classList.remove("bg-black", "text-white"));
-        if (songList[currentIndex]) {
-            songList[currentIndex].classList.add("bg-black", "text-white");
-        }
+    function playSong(index) {
+        if (index < 0 || index >= songs.length) return;
+        currentIndex = index;
+        const song = songs[currentIndex];
+        
+        player.src = song.url;
+        player.play();
+        updateUI();
     }
 
     function playAllSongs() {
-        if (songs.length === 0) return;
-
-        currentIndex = 0;
-        player.src = songs[currentIndex].url;
-        player.play();
-        updateNowPlaying();
-        highlightCurrentSong();
+        if (songs.length > 0) playSong(0);
     }
 
     function playNextSong() {
-        currentIndex++;
-        if (currentIndex < songs.length) {
-            player.src = songs[currentIndex].url;
-            player.play();
-            updateNowPlaying();
-            highlightCurrentSong();
+        if (currentIndex < songs.length - 1) {
+            playSong(currentIndex + 1);
         } else {
-            nowPlaying.innerText = "All songs played.";
+            playSong(0); // Loop back
         }
     }
 
     function playPreviousSong() {
-        if (songs.length === 0) return;
-        currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-        player.src = songs[currentIndex].url;
-        player.play();
-        updateNowPlaying();
-        highlightCurrentSong();
-    }
-
-    function togglePlay() {
-        if (player.paused) {
-            player.play();
+        if (currentIndex > 0) {
+            playSong(currentIndex - 1);
         } else {
-            player.pause();
+            playSong(songs.length - 1);
         }
     }
 
-    function updateNowPlaying() {
-        nowPlaying.innerText = `🎧 ${songs[currentIndex].title} - ${songs[currentIndex].artist}`;
+    function togglePlay() {
+        if (player.src) {
+            player.paused ? player.play() : player.pause();
+        } else {
+            playAllSongs();
+        }
     }
 
-    // Auto play next song
+    // JS for UI
+    const progressBar = document.getElementById("progressBar");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationTimeEl = document.getElementById("durationTime");
+    const playIcon = document.getElementById("playIcon");
+    const nowArtistText = document.getElementById("nowArtist");
+
+    function updateUI() {
+        const song = songs[currentIndex];
+        nowPlayingText.innerText = song.title;
+        nowArtistText.innerText = song.artist;
+        if (playerCover) playerCover.src = song.cover;
+        
+        songItems.forEach(item => item.classList.remove("active-song"));
+        const currentItem = document.querySelector(`[data-index="${currentIndex}"]`);
+        if (currentItem) {
+            currentItem.classList.add("active-song");
+        }
+    }
+
+    // Rotate Animation and Icon Play/Pause
+    player.onplay = () => {
+        playerCover.style.animationPlayState = "running";
+        playIcon.classList.replace("bi-play-fill", "bi-pause-fill");
+    };
+
+    player.onpause = () => {
+        playerCover.style.animationPlayState = "paused";
+        playIcon.classList.replace("bi-pause-fill", "bi-play-fill");
+    };
+
+    // Update Progress Bar
+    player.ontimeupdate = () => {
+        if (player.duration) {
+            const per = (player.currentTime / player.duration) * 100;
+            progressBar.value = per;
+            
+            currentTimeEl.innerText = formatTime(player.currentTime);
+            durationTimeEl.innerText = formatTime(player.duration);
+        }
+    };
+
+    // Skip on Progress Bar
+    progressBar.oninput = () => {
+        const seekTime = (progressBar.value / 100) * player.duration;
+        player.currentTime = seekTime;
+    };
+
+    function formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' + sec : sec}`;
+    }
+
     player.onended = playNextSong;
 </script>
 
+<style>
+    .album-main-img {
+        transition: transform 0.4s ease;
+    }
+    .album-main-img:hover {
+        transform: scale(1.03);
+    }
 
+    .shadow-pink-glow {
+        box-shadow: 0 10px 40px rgba(255, 45, 85, 0.3) !important;
+    }
+    .active-song {
+        background: rgba(255, 45, 85, 0.15) !important;
+        border-left: 4px solid var(--accent-pink) !important;
+    }
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>
 {% endblock %}

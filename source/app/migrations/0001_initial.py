@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -38,12 +37,18 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=255)),
                 ('cover_image', models.ImageField(blank=True, null=True, upload_to='covers/')),
-                ('audio_file', models.FileField(upload_to='songs/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['mp3'])])),
+                ('audio_file', models.FileField(upload_to='songs/', validators=[
+                    django.core.validators.FileExtensionValidator(allowed_extensions=['mp3'])])),
                 ('lyrics', models.TextField(blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('artist', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='songs', to='app.artist')),
-                ('genre', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='songs', to='app.genre')),
-                ('uploaded_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('artist',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='songs',
+                                   to='app.artist')),
+                ('genre',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='songs',
+                                   to='app.genre')),
+                ('uploaded_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                                  to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

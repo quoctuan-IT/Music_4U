@@ -1,31 +1,127 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}Search 🔍{% endblock %}
+{% block title %}Search Results | QT-M4U{% endblock %}
 
 {% block content %}
 
+{% include 'partials/search_card.html' %}
+
 <div class="container">
-    <h3 class="mb-4">🔍 Search Results:
-        {% if query %} "{{ query }}"{% endif %}
-        {% if query and selected_genre %} -{% endif %}
-        {% if selected_genre %} "{{ selected_genre_name }}"{% endif %}
-    </h3>
-
-    <!-- Results -->
-    {% if songs %}
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for song in songs %}
-        {% include 'partials/song_card.html' %}
-        {% endfor %}
+    <!-- Search Header -->
+    <div class="mb-5">
+        <h6 class="text-pink text-uppercase fw-bold ls-1 mb-2">Search Results</h6>
+        <h5 class="fw-bold text-white">
+            {% if query and selected_genre %}
+                <span class="opacity-50">Results for</span> '{{ query }}' - '{{ selected_genre_name }}'
+            {% elif selected_genre %}
+                <span class="opacity-50">Genre:</span> '{{ selected_genre_name }}'
+            {% elif query %}
+                <span class="opacity-50">Results for</span> '{{ query }}'
+            {% else %}
+                Explore Music
+            {% endif %}
+        </h5>
     </div>
+
+    {% if songs or artists %}
+        
+        <!-- Songs Section -->
+        {% if songs %}
+        <section class="mb-5">
+            <div class="d-flex align-items-center mb-4">
+                <h4 class="text-white fw-bold mb-0 me-3">Songs</h4>
+                <div class="flex-grow-1 border-bottom border-secondary border-opacity-25"></div>
+            </div>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+                {% for song in songs %}
+                    <div class="col">
+                        {% include 'partials/song_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Artists Section -->
+        {% if artists %}
+        <section class="mb-5">
+            <div class="d-flex align-items-center mb-4">
+                <h4 class="text-white fw-bold mb-0 me-3">Artists</h4>
+                <div class="flex-grow-1 border-bottom border-secondary border-opacity-25"></div>
+            </div>
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+                {% for artist in artists %}
+                    <div class="col">
+                        {% include 'partials/artist_card.html' %}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
     {% else %}
-    <div class="alert alert-warning text-center" role="alert">
-        😢 No songs found.
-    </div>
+        <!-- Empty State (No Results) -->
+        <div class="text-center py-5 rounded-0 mt-4">
+            <div class="mb-4">
+                <div class="search-empty-icon mx-auto mb-3">
+                    <i class="bi bi-search-heart text-secondary opacity-25"></i>
+                </div>
+                <h3 class="text-white fw-bold">No results found!</h3>
+                <p class="text-secondary mb-4 mx-auto" style="max-width: 400px;">
+                    We couldn't find any songs or artists matching your search.
+                </p>
+                <a class="btn btn-pink rounded-pill px-5 py-2 fw-bold shadow-sm" href="{% url 'index' %}">
+                    <i class="bi bi-house-door me-2"></i>Home
+                </a>
+            </div>
+        </div>
     {% endif %}
-
 </div>
 
+<style>
+    /* Letter spacing for small headers */
+    .ls-1 {
+        letter-spacing: 2px;
+    }
+
+    /* Icon effect in empty state */
+    .search-empty-icon {
+        font-size: 5rem;
+        transition: transform 0.5s ease;
+    }
+    
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .row.g-4 {
+        margin-top: 0;
+    }
+
+    /* Animation for Section */
+    section {
+        animation: fadeInUp 0.6s ease backwards;
+    }
+
+    section:nth-child(2) { animation-delay: 0.2s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+        .display-6 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
 {% endblock %}

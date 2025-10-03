@@ -1,51 +1,127 @@
 {% extends "base.html" %}
-
 {% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Home | QT-M4U{% endblock %}
 
 {% block content %}
 
-{% if songs and artists %}
-<div class="container">
-    <div class="mb-4">
-        <p class="display-6 fw-bold text-center">
-            <i class="bi bi-music-note-beamed"></i> Newest
-        </p>
-    </div>
+{% include 'partials/search_card.html' %}
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-        {% for song in songs %}
-        {% include 'partials/song_card.html' %}
-        {% endfor %}
+{% if songs and artists %}
+<!-- Hero Welcome Banner -->
+<div class="home-hero mb-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #000 0%, #1a1a1a 100%); border-bottom: 1px solid rgba(255, 45, 85, 0.2);">
+    <div class="container py-5 position-relative" style="z-index: 2;">
+        <div class="row align-items-center py-4">
+            <div class="col-lg-7 text-center text-lg-start">
+                <span class="badge btn-pink mb-3 p-2 px-3 rounded-pill fw-bold">WELCOME TO PQT - M4U</span>
+                <h1 class="display-3 fw-bold text-white mb-3">Music for <span class="text-pink">Homies</span></h1>
+                <p class="lead text-secondary mb-4">Music Streaming Platform Developed by <strong style="color: pink;">Quốc Tuấn IT ❤️</strong></p>
+                
+                <div class="d-flex gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{% url 'songs' %}" class="btn btn-pink rounded-pill px-3 py-3 fw-bold shadow d-inline-flex align-items-center justify-content-center" style="height: 45px; min-width: 140px;">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Songs
+                    </a>
+                    <a href="{% url 'artists' %}" class="btn btn-outline-light rounded-pill px-3 py-3 fw-bold d-inline-flex align-items-center justify-content-center" style="height: 45px; min-width: 140px;">
+                        <i class="bi bi-person-fill text-pink me-2"></i>Artists
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-5 d-none d-lg-block text-end">
+                <i class="bi bi-vinyl-fill text-pink opacity-25" style="font-size: 15rem;"></i>
+            </div>
+        </div>
     </div>
+    <!-- Decorative background glow -->
+    <div class="position-absolute top-0 end-0 translate-middle-y" style="width: 400px; height: 400px; background: radial-gradient(circle, rgba(255, 45, 85, 0.15) 0%, transparent 70%); z-index: 1;"></div>
 </div>
 
-<div class="container py-5">
-    <div class="mb-4">
-        <p class="display-6 fw-bold text-center">
-            <i class="bi bi-person-fill"></i> Artists
-        </p>
-    </div>
+<div class="container">
+    <!-- Newest Songs Section -->
+    <section class="mb-5 mt-2">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-0">
+                    <i class="bi bi-stars text-pink me-2"></i>Newest Releases
+                </h2>
+                <div class="header-line mt-2"></div>
+            </div>
+            <a href="{% url 'songs' %}" class="text-pink text-decoration-none small fw-bold">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-        {% for artist in artists %}
-        {% include 'partials/artist_card.html' %}
-        {% endfor %}
-    </div>
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+            {% for song in songs %}
+                <div class="col card-hover-effect">
+                    {% include 'partials/song_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Artists Section -->
+    <section class="py-5">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold text-white mb-0">
+                    <i class="bi bi-person-fill text-pink me-2"></i>Trending Artists
+                </h2>
+                <div class="header-line mt-2"></div>
+            </div>
+            <a href="{% url 'artists' %}" class="text-pink text-decoration-none small fw-bold">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-4">
+            {% for artist in artists %}
+                <div class="col card-hover-effect">
+                    {% include 'partials/artist_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 
 {% else %}
-
-<!-- Empty State -->
-<div class="text-center py-5">
-    <div class="mb-4">
-        <i class="bi bi-music-note-list" style="font-size: 4rem; color: #6c757d;"></i>
+<!-- Empty State (Maintenance Mode) -->
+<div class="container d-flex align-items-center justify-content-center">
+    <div class="text-center p-5 shadow-lg border-0">
+        <div class="mb-4">
+            <div class="spinner-grow text-pink" role="status" style="width: 3rem; height: 3rem;"></div>
+        </div>
+        <i class="bi bi-megaphone display-1 text-secondary mb-3"></i>
+        <h3 class="text-white fw-bold">Maintenance</h3>
+        <p class="text-secondary mb-4">Quoc Tuan busy now!</p>
     </div>
-    <h4 class="text-muted mb-3">Website Paused</h4>
-    <p class="text-muted mb-4">Please contact to Admin.</p>
 </div>
-
 {% endif %}
+
+<style>
+    /* Header line decoration */
+    .header-line {
+        width: 60px;
+        height: 4px;
+        background: var(--accent-pink);
+        border-radius: 2px;
+    }
+    
+    /* Card Animation */
+    .card-hover-effect {
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .card-hover-effect:hover {
+        transform: translateY(-8px);
+        z-index: 10;
+    }
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Mobile Typography */
+    @media (max-width: 768px) {
+        .display-3 { font-size: 2.5rem; }
+        .row-cols-2 { padding: 0 5px; }
+    }
+</style>
 
 {% endblock %}

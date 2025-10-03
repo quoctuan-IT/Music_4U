@@ -1,4 +1,4 @@
-from .models import Genre, Artist
+from .models import Genre
 
 
 # Global data

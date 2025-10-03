@@ -1,8 +1,8 @@
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 
 from .forms import RegisterForm, AlbumForm
@@ -11,7 +11,7 @@ from .models import Song, Album, Genre, Artist
 
 def index(request):
     songs = Song.objects.all().order_by("-id")[:5]  # Display newest
-    artists = Artist.objects.all()
+    artists = Artist.objects.all().order_by("-id")[:5]  # Display newest
 
     return render(request, "index.html", {"songs": songs, "artists": artists})
 
@@ -24,10 +24,11 @@ def register(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
+            messages.success(request, "Register successfully.")
 
             return redirect("login")
         else:
-            messages.error(request, "Register failed!")
+            messages.error(request, "Register failed.")
 
     else:
         form = RegisterForm()
@@ -50,14 +51,14 @@ def login_view(request):
 
             return redirect("/")
         else:
-            messages.error(request, "Login failed!")
+            messages.error(request, "Login failed.")
 
     return render(request, "app/user/login.html")
 
 
 def logout_view(request):
     auth_logout(request)
-    messages.success(request, "Logout successfully!.")
+    messages.success(request, "Logout successfully.")
 
     return redirect("login")
 
@@ -78,8 +79,8 @@ def favorite_songs(request):
 
 # Songs
 def songs(request):
-    songs = Song.objects.all().order_by("-id")[:5]  # Display newest Songs
-    artists = Artist.objects.all()
+    songs = Song.objects.all().order_by("-id")[:5]  # Display newest
+    artists = Artist.objects.all().order_by("-id")[:5]  # Display newest
 
     return render(request, "app/song/index.html", {"songs": songs, "artists": artists})
 
@@ -127,11 +128,13 @@ def song_to_album(request, song_id):
         album = get_object_or_404(Album, id=album_id, user=request.user)
 
         if song in album.songs.all():
-            messages.info(request, "🎵 This Song is already in the Album.")
+            messages.info(
+                request, f"'{song.title}' is already in the Album '{album.name}'."
+            )
         else:
             album.songs.add(song)
             messages.success(
-                request, f'Song "{song.title}" was added to Album "{album.name}".'
+                request, f"'{song.title}' was added to Album '{album.name}'."
             )
 
         return redirect("song_detail", song_id=song.id)
@@ -162,7 +165,9 @@ def album_create(request):
             album.user = request.user
             album.save()
             form.save_m2m()
-            messages.success(request, "Album created successfully!")
+            messages.success(
+                request, f"Album '{album.name}' Created successfully."
+            )
 
             return redirect("albums")
     else:
@@ -175,7 +180,9 @@ def album_create(request):
 def album_delete(request, album_id):
     album = get_object_or_404(Album, id=album_id, user=request.user)
     album.delete()
-    messages.success(request, "Album deleted successfully.")
+    messages.success(
+        request, f"Album '{album.name}' Deleted."
+    )
 
     return redirect("albums")
 
@@ -186,7 +193,9 @@ def album_remove_song(request, album_id, song_id):
     song = get_object_or_404(Song, id=song_id)
 
     album.songs.remove(song)
-    messages.success(request, f"Removed '{song.title}' from album.")
+    messages.success(
+        request, f"Removed '{song.title}' from Album '{album.name}'."
+    )
 
     return redirect("album_detail", album_id=album.id)
 
@@ -198,6 +207,7 @@ def artists(request):
     return render(request, "app/artist/index.html", {"artists": artists})
 
 
+@login_required
 def artist_detail(request, artist_id):
     artist = get_object_or_404(Artist, id=artist_id)
     songs = Song.objects.filter(artist=artist).order_by("-id")
@@ -207,13 +217,15 @@ def artist_detail(request, artist_id):
 
 # Search
 def search(request):
-    query = request.GET.get("query", "")
-    genre_id = request.GET.get("genre", "")
+    query = request.GET.get("query")
+    genre_id = request.GET.get("genre")
 
     songs = Song.objects.all()
+    artists = Artist.objects.all()
 
     if query:
         songs = songs.filter(title__icontains=query)
+        artists = artists.filter(name__icontains=query)
 
     selected_genre_obj = None
     if genre_id:
@@ -224,7 +236,6 @@ def search(request):
         except Genre.DoesNotExist:
             selected_genre_obj = None
 
-    artists = Artist.objects.all()
 
     context = {
         # Data

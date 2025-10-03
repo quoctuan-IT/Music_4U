@@ -48,7 +48,7 @@ class AlbumForm(forms.ModelForm):
         fields = ["name", "songs"]
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Enter album name"}
+                attrs={"class": "form-control", "placeholder": "Enter Album name"}
             ),
         }
         labels = {

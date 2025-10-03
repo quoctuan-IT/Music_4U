@@ -1,81 +1,85 @@
 {% load static %}
-
-<!doctype html>
-<html lang="en" data-bs-theme="dark">
-
+<!DOCTYPE html>
+<html data-bs-theme="dark" lang="en">
 <head>
-    <title>
-        {% block title %}{% endblock %}
-    </title>
-
-    <!-- Required meta tags -->
+    <title>{% block title %}{% endblock %}</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-    <link rel="icon" href="{% static 'images/logo-IT.png' %}" type="image/png">
-
-    <!-- App Static -->
-    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
-    
-    <!-- Bootstrap CSS -->
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
+    <link href="{% static 'images/logo-IT.png' %}" rel="icon" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Icon -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bs-primary: #ff2c92d9;
+            --bs-body-bg: #000000;
+            --bs-body-color: #f8f9fa;
+            --accent-pink: #fa70be;
+        }
+        body {
+            background-color: var(--bs-body-bg);
+            color: var(--bs-body-color);
+        }
+        .text-pink { color: var(--accent-pink) !important; }
+        .btn-pink {
+            background-color: var(--bs-primary);
+            border-color: var(--bs-primary);
+            color: white;
+        }
+        .btn-pink:hover {
+            background-color: var(--accent-pink);
+            border-color: var(--accent-pink);
+            color: black;
+        }
+        .btn-outline-pink {
+            color: var(--accent-pink);
+            border-color: var(--accent-pink);
+        }
+        .btn-outline-pink:hover {
+            background-color: var(--accent-pink);
+            color: black;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
 </head>
 
-<body style="background-color: black; color: pink;">
+<body>
+    <div class="d-flex flex-column min-vh-100">
+        {% include 'partials/header.html' %}
+        
+        {% include 'partials/message.html' %}
+        
+        <main class="flex-grow-1 container mt-5">
+            {% block content %}{% endblock %}
+        </main>
 
-    {% include 'partials/header.html' %}
-
-    {% include 'partials/search_card.html' %}
-
-    {% block content %}{% endblock %}
-
-    {% include 'partials/footer.html' %}
-
+        {% include 'partials/footer.html' %}
+    </div>
 
     <script>
-        // JS for button Favorite
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".btn-favorite").forEach(button => {
-                button.addEventListener("click", function () {
-                    let songId = this.getAttribute("data-song-id");
+            document.body.addEventListener("click", function (e) {
+                const btn = e.target.closest(".btn-favorite");
+                if (!btn) return;
 
-                    fetch(`/song/${songId}/favorite/`, {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": "{{ csrf_token }}",
-                            "X-Requested-With": "XMLHttpRequest"
-                        }
-                    })
-                        .then(response => {
-                            if (response.redirected) {
-                                window.location.href = response.url; // Redirect to Login
-                                return;
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.is_favorite) {
-                                this.innerHTML = "❤️ Liked";
-                            } else {
-                                this.innerHTML = "🤍 Like";
-                            }
-                        })
-                        .catch(error => console.error("Error:", error));
-                });
+                const songId = btn.getAttribute("data-song-id");
+                fetch(`/song/${songId}/favorite/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                })
+                .then(res => res.redirected ? (window.location.href = res.url) : res.json())
+                .then(data => {
+                    btn.innerHTML = data.is_favorite 
+                        ? '<i class="bi bi-heart-fill text-danger"></i>' 
+                        : '<i class="bi bi-heart text-pink"></i>';
+                })
+                .catch(err => console.error(err));
             });
         });
     </script>
-
-    <!-- Bootstrap JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- App JS -->
     <script src="{% static 'app/js/main.js' %}"></script>
-
-
 </body>
-
 </html>

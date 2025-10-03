@@ -1,78 +1,89 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block title %}Profile - {{ user.username }}{% endblock %}
 
 {% block content %}
-
-<div class="container py-2">
+<div class="container py-5 mt-5">
     <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-10">
-
-            <!-- Profile Header -->
-            <div class="card shadow-lg border-0 mb-4">
-                <div class="card-header text-black text-center py-2" style="background-color: pink;">
-                    <h2 class="fw-bold mb-1">
-                        <i class="bi bi-person-circle"></i>
-                        {{ user.first_name }}
-                        {{ user.last_name|default:"Unknow" }}
-                    </h2>
+        <div class="col-lg-8">
+            
+            <!-- Profile Header Card -->
+            <div class="card bg-dark border-0 shadow-lg rounded-4 overflow-hidden mb-4 shadow-pink-glow">
+                <!-- Header background with gradient -->
+                <div class="card-header border-0 py-2 text-center" style="background: linear-gradient(45deg, #ff2d55, #000);">
+                    <div class="position-relative d-inline-block mb-3">
+                        <i class="bi bi-person-circle display-1 text-white"></i>
+                        <span class="position-absolute bottom-0 end-0 p-2 bg-success border border-light rounded-circle shadow-sm">
+                            <span class="visually-hidden">Online</span>
+                        </span>
+                    </div>
+                    <h2 class="fw-bold text-white mb-0">{{ user.username }}</h2>
+                    <p class="text-white-50 mb-0">{% if user.is_staff %}Administrator{% else %}Music Enthusiast{% endif %}</p>
                 </div>
 
-                <!-- Profile Info -->
-                <div class="card-body p-4">
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center">
-                                <div>
-                                    <small class="text-muted"><i class="bi bi-envelope-open-heart"></i> Email</small>
-                                    <div class="fw-semibold">{{ user.email}}
-                                    </div>
-                                </div>
-                            </div>
+                <div class="card-body p-4 bg-black text-white">
+                    <div class="row text-center g-4">
+                        <div class="col-md-6 border-end border-secondary border-opacity-25">
+                            <small class="text-secondary d-block text-uppercase mb-1 fw-bold ls-1">Email Address</small>
+                            <div class="fw-semibold fs-5">{{ user.email }}</div>
                         </div>
-
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center">
-                                <div>
-                                    <small class="text-muted"><i class="bi bi-calendar-heart"></i> Member Since</small>
-                                    <div class="fw-semibold">{{ user.date_joined|date:"F j, Y" }}</div>
-                                </div>
-                            </div>
+                            <small class="text-secondary d-block text-uppercase mb-1 fw-bold ls-1">Member Since</small>
+                            <div class="fw-semibold fs-5">{{ user.date_joined|date:"F j, Y" }}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="card shadow-sm border-0 mb-4" style="background-color: black;">
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <a href="{% url 'favorite' %}" class="btn btn-outline-danger w-100 py-3">
-                                <i class="fas fa-heart fa-2x mb-2 d-block"></i>
-                                <div class="fw-semibold">Favorite Songs ❤️</div>
-                            </a>
+            <!-- Dashboard Grid -->
+            <h4 class="text-white mb-4 fw-bold px-2">Dashboard</h4>
+            <div class="row g-3">
+                <!-- Favorites -->
+                <div class="col-md-4">
+                    <a href="{% url 'favorite' %}" class="dashboard-card group">
+                        <div class="card bg-dark border-0 h-100 rounded-4 transition-all">
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-box mb-3 bg-danger bg-opacity-10 rounded-circle d-inline-flex p-3">
+                                    <i class="bi bi-heart-fill text-danger fs-2"></i>
+                                </div>
+                                <h5 class="text-white fw-bold mb-1">Favorites</h5>
+                                <p class="text-secondary small mb-0">Your saved tracks</p>
+                            </div>
                         </div>
-
-                        <div class="col-md-4">
-                            <a href="{% url 'albums' %}" class="btn btn-outline-primary w-100 py-3">
-                                <i class="fas fa-compact-disc fa-2x mb-2 d-block"></i>
-                                <div class="fw-semibold">Albums <i class="bi bi-music-note-list"></i></div>
-                            </a>
-                        </div>
-
-                        {% if user.is_staff %}
-                        <div class="col-md-4">
-                            <a href="/admin" class="btn btn-outline-warning w-100 py-3">
-                                <i class="fas fa-cog fa-2x mb-2 d-block"></i>
-                                <div class="fw-semibold">Admin <i class="bi bi-person-circle"></i></div>
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
+                    </a>
                 </div>
+
+                <!-- Albums -->
+                <div class="col-md-4">
+                    <a href="{% url 'albums' %}" class="dashboard-card group">
+                        <div class="card bg-dark border-0 h-100 rounded-4 transition-all">
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-box mb-3 bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3">
+                                    <i class="bi bi-collection-play-fill text-primary fs-2"></i>
+                                </div>
+                                <h5 class="text-white fw-bold mb-1">Albums</h5>
+                                <p class="text-secondary small mb-0">Manage your playlists</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Admin Panel (Conditional) -->
+                {% if user.is_staff %}
+                <div class="col-md-4">
+                    <a href="/admin" class="dashboard-card group">
+                        <div class="card bg-dark border-0 h-100 rounded-4 transition-all">
+                            <div class="card-body p-4 text-center">
+                                <div class="icon-box mb-3 bg-warning bg-opacity-10 rounded-circle d-inline-flex p-3">
+                                    <i class="bi bi-shield-lock-fill text-warning fs-2"></i>
+                                </div>
+                                <h5 class="text-white fw-bold mb-1">Admin</h5>
+                                <p class="text-secondary small mb-0">System settings</p>
+                            </div>
+                        </div>
+                    </a>
+                {% endif %}
             </div>
 
         </div>
@@ -80,37 +91,49 @@
 </div>
 
 <style>
-    /* Hover effects for action buttons */
-    .btn-outline-danger:hover,
-    .btn-outline-primary:hover,
-    .btn-outline-success:hover,
-    .btn-outline-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transition: all 0.3s ease;
+    /* Glow effect for the main card */
+    .shadow-pink-glow {
+        box-shadow: 0 10px 40px rgba(255, 45, 85, 0.2) !important;
     }
 
-    /* Profile card hover effect */
-    .card:hover {
-        transform: translateY(-2px);
-        transition: all 0.3s ease;
+    /* Dashboard card hover logic */
+    .dashboard-card {
+        text-decoration: none;
+        display: block;
+    }
+    
+    .dashboard-card .card {
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
+    .dashboard-card:hover .card {
+        transform: translateY(-10px);
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: var(--accent-pink) !important;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .icon-box {
+        transition: transform 0.3s ease;
+    }
+
+    .dashboard-card:hover .icon-box {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .ls-1 {
+        letter-spacing: 1px;
+    }
+
+    /* Responsive border fix */
+    @media (max-width: 767px) {
         .border-end {
-            border-right: none !important;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .border-end:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+            border-end: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            padding-bottom: 20px;
+            margin-bottom: 10px;
         }
     }
 </style>
-
 {% endblock %}

@@ -1,42 +1,39 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block title %}Songs{% endblock %}
 
 {% block content %}
 
-<div class="container">
-    <div class="mb-4">
-        <p class="display-6 fw-bold text-center">
-            <i class="bi bi-music-note-beamed"></i> Songs
-        </p>
+{% include 'partials/search_card.html' %}
+
+<div class="container pb-4">
+    <div class="mb-5">
+        <h2 class="display-6 fw-bold text-center text-pink text-uppercase tracking-wider">
+            <i class="bi bi-vinyl-fill"></i> Songs Collection
+        </h2>
+        <div class="mx-auto" style="width: 60px; height: 3px; background: var(--bs-primary);"></div>
     </div>
 
-    <!-- Song Grid Container -->
     {% if songs %}
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
-
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
         {% for song in songs %}
-        {% include 'partials/song_card.html' %}
+            {% include 'partials/song_card.html' %}
         {% endfor %}
-
     </div>
     {% else %}
-
-    <!-- Empty State -->
-    <div class="text-center py-5">
+    <div class="text-center py-5 rounded-0>">
         <div class="mb-4">
-            <i class="bi bi-music-note-list" style="font-size: 4rem; color: #6c757d;"></i>
+            <i class="bi bi-mic-mute text-secondary" style="font-size: 4rem;"></i>
         </div>
-        <h4 class="text-muted mb-3">No Songs Found</h4>
-        <p class="text-muted mb-4">Try adjusting your search criteria or browse our music collection.</p>
-        <a href="{% url 'index' %}" class="btn btn-primary">
-            <i class="bi bi-arrow-left me-2"></i>Back to Home
+
+        <h4 class="text-white mb-2">No Songs Found</h4>
+        <p class="text-secondary mb-4">We couldn't find any music.</p>
+
+        <a class="btn btn-outline-pink rounded-pill px-4" href="{% url 'index' %}">
+            <i class="bi bi-arrow-left me-2"></i> Home
         </a>
     </div>
     {% endif %}
-    
 </div>
-
 {% endblock %}

@@ -3,25 +3,15 @@ __pycache__/
 *.pyc
 
 # Django
-db.sqlite3
 staticfiles/
-media/
+source/media/*
+db.sqlite3
 
 # Virtual env
-.env
-.venv
 venv/
-ENV/
+.env
 
 # IDE
 .vscode/
 .idea/
-
-# Cursor
-.cursorignore
-.cursorindexingignore
-
-# Project specific
-staticfiles/
-media/
-NOTE.txt
+.github/

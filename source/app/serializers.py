@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import Song, Artist, Genre, Album
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from .models import Song, Artist, Genre, Album
 
 
 class GenreSerializer(serializers.ModelSerializer):

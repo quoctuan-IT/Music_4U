@@ -1,35 +1,78 @@
 {% load static %}
 
-<!-- Artist Card -->
 <div class="col">
-    <div class="card h-100 shadow-sm border-0 artist-card">
-        <!-- Artist Image -->
-        <div class="position-relative overflow-hidden">
-            <a href="{% url 'artist_detail' artist.id %}">
-
+    <div class="card h-100 bg-transparent border-0 artist-card group text-center">
+        <a href="{% url 'artist_detail' artist.id %}" class="text-decoration-none">
+            <div class="position-relative mx-auto mb-3 overflow-hidden rounded-circle shadow-lg artist-img-wrapper" 
+                 style="width: 180px; height: 180px; border: 2px solid transparent; transition: border-color 0.3s ease;">
+                
                 {% if artist.image %}
-                <img src="{{ artist.image.url }}" class="card-img-top" alt="{{ artist.name }}"
-                    style="height: 200px; object-fit: cover;">
+                <img alt="{{ artist.name }}" class="img-fluid h-100 w-100 artist-img" src="{{ artist.image.url }}" style="object-fit: cover;">
                 {% else %}
-                <img src="{% static 'images/logo-IT.png' %}" class="card-img-top" alt="Default artist"
-                    style="height: 200px; object-fit: cover;">
+                <img alt="Default artist" class="img-fluid h-100 w-100 artist-img" src="{% static 'images/default-artist.png' %}" style="object-fit: cover;">
                 {% endif %}
 
-            </a>
-
-            <!-- View Button Overlay -->
-            <div class="position-absolute top-50 start-50 translate-middle play-overlay d-none">
-                <a class="btn btn-primary rounded-circle btn-lg" href="{% url 'artist_detail' artist.id %}">
-                    <i class="bi bi-person-fill"></i>
-                </a>
+                <div class="artist-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-search text-white fs-4"></i>
+                </div>
             </div>
-        </div>
 
-        <!-- Card Body -->
-        <div class="card-body d-flex flex-column">
-            <h4 class="card-title text-truncate mb-2" title="{{ artist.name }}">
-                {{ artist.name }}
-            </h4>
+            <div class="card-body p-0">
+                <h5 class="card-title text-white fw-bold mb-1 hover-pink transition-base">{{ artist.name }}</h5>
+                <p class="text-secondary small text-uppercase tracking-tighter">
+                    <i class="bi bi-music-note-beamed me-1"></i> {{ artist.songs.count }} Songs
+                </p>
+            </div>
+        </a>
+        
+        <div class="card-footer bg-transparent border-0 p-0 mt-2">
+            <a href="{% url 'artist_detail' artist.id %}" class="btn btn-sm btn-outline-pink rounded-pill px-4 fw-bold">
+                Profile
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+    .artist-img-wrapper:hover {
+        border-color: var(--accent-pink) !important;
+        box-shadow: 0 0 20px rgba(255, 45, 85, 0.3) !important;
+    }
+
+    .artist-img {
+        transition: transform 0.5s ease;
+    }
+
+    .artist-card:hover .artist-img {
+        transform: scale(1.1);
+        filter: brightness(0.6);
+    }
+
+    .artist-overlay {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background: rgba(255, 45, 85, 0.2);
+    }
+
+    .artist-card:hover .artist-overlay {
+        opacity: 1;
+    }
+
+    .hover-pink:hover {
+        color: var(--accent-pink) !important;
+    }
+
+    .transition-base {
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 576px) {
+        .artist-img-wrapper {
+            width: 140px !important;
+            height: 140px !important;
+        }
+        .card-title {
+            font-size: 1rem;
+        }
+    }
+</style>
