@@ -1,8 +1,6 @@
-# Python cache
+# Python cache & Django
 __pycache__/
 *.pyc
-
-# Django
 staticfiles/
 source/media/*
 db.sqlite3

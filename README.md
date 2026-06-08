@@ -5,16 +5,22 @@
 Furthermore, it features a Admin Dashboard, providing administrators with control songs, albums, artist, genres, and user management through a secure, role-based access control (RBAC) system.
 
 ## 🌐 Deployment
-- 🚀 **Web App**: [phamquoctuan041203.pythonanywhere.com](https://phamquoctuan041203.pythonanywhere.com/)
-- 📖 **Django REST API**: [phamquoctuan041203.pythonanywhere.com/api](https://phamquoctuan041203.pythonanywhere.com/api/)
+- 🚀 **Front-end React-JS**: [music4u-reactjs.vercel.app](https://music4u-reactjs.vercel.app/)
+- 🚀 **Back-end Django REST APIs**: [phamquoctuan041203.pythonanywhere.com/api](https://phamquoctuan041203.pythonanywhere.com/api/)
+- 🚀**Web App MVC**: [phamquoctuan041203.pythonanywhere.com](https://phamquoctuan041203.pythonanywhere.com/)
+
+###
+
+- *Source Front-end:* [github.com/quoctuan-IT/Music_4U-React_JS](https://github.com/quoctuan-IT/Music_4U-React_JS.git)
+- *Source Back-end:* [github.com/quoctuan-IT/Music_4U](https://github.com/quoctuan-IT/Music_4U.git)
 
 ## 🛠️ Tech Stack
 - ⚙️ **Backend**: Python 3 (Django REST Framework 5)
 - 🔗 **ORM**: Django ORM
 - 🗄️ **Database**: MySQL Workbench 8
-- 🔐 **Authentication**: Django Session + Simple JWT
+- 🔐 **Authentication**: Django Session + Simple JWT Auth
 - 📄 **API Documentation**: Django REST Framework API
-- 🎨 **Frontend**: HTML5, CSS3, Bootstrap5, JavaScript
+- 🎨 **Frontend**: React-JS (Vite), Axios, JavaScript, HTML5, CSS3, Bootstrap5
 - 🌈 **Icons**: Bootstrap Icons
 
 ## ✨ Features
@@ -59,13 +65,15 @@ Furthermore, it features a Admin Dashboard, providing administrators with contro
 - `GET /profile` — Get user profile
 
 ### Search API (`/api/search`)
-- `GET /api/search/?query=<strings>&genre=<id>` — Search songs
+- `GET /?query=<strings>&genre=<id>` — Search songs
 
 ### Songs API (`/api/songs`)
 - `GET /` — List songs
 - `GET /{id}` — Song detail
-- `GET /api/songs/favorites/` — List favorite songs ``JWT token``
-- `POST /api/songs/{id}/favorite/` — Toggle favorite ``JWT token``
+
+### Favorites Songs API (`/api/`)
+- `GET favorites/` — List favorite songs ``JWT token``
+- `POST songs/{id}/favorite/` — Toggle favorite ``JWT token``
 
 ### Artists API (`/api/artists`)
 - `GET /` — List artists
@@ -76,16 +84,10 @@ Furthermore, it features a Admin Dashboard, providing administrators with contro
 - `GET /{id}` — Genre detail 
 
 ### Albums API (`/api/albums`) - ``JWT token``
-- `GET /api/albums/` — List my albums
-- `POST /api/albums/` — Create album
-- `GET|PUT|DELETE /api/albums/{id}/` — Album CRUD
-- `POST /api/albums/{album_id}/songs/{song_id}/add/` — Add song to album
-- `DELETE /api/albums/{album_id}/songs/{song_id}/remove/` — Remove song from album
-
-### Admin API (`/api/admin`) - ``JWT token``
-- `GET|POST /songs` — Song CRUD
-- `GET|POST /artists` — Artist CRUD
-- `GET|POST /genres` — Genre CRUD
+- `GET|POST /` — List my albums | Create album
+- `GET|DELETE {id}/` — Album detail | DELETE
+- `POST albums/{album_id}/songs/{song_id}/` — Add song to album
+- `DELETE albums/{album_id}/songs/{song_id}/remove/` — Remove song from album
 
 ## 🏗️ Solution Structure
 ```text
@@ -94,7 +96,7 @@ Music-4U/
 │   ├── app/                     # 🎵 Core application logic (Models, Views, Serializers)
 │   ├── project/                 # ⚙️ Project settings & configurations (settings.py, urls.py)
 │   ├── media/                   # 📂 User-uploaded audio files & images (Git ignored)
-│   ├── static/                  # Frontend assets (CSS, JavaScript, Images)
+│   ├── static/                  # 🎨 Frontend assets (CSS, JavaScript, Images)
 │   ├── templates/               # HTML interface components
 │   ├── .env                     # 🔐 Private environment variables
 │   ├── manage.py                # Administrative command-line utility
@@ -131,8 +133,8 @@ python manage.py runserver
 ```
 
 ### 5) 🌍 Access
-- MVC: `https://localhost:<port>/`
 - ADMIN: `https://localhost:<port>/admin`
+- MVC: `https://localhost:<port>/`
 - API: `https://localhost:<port>/api`
 
 ## 🧪 Quick API Test Flow `(Django REST API)`
@@ -186,10 +188,11 @@ Media (images, audio files) are saved at: `source/media/`.
     </svg>
     <br />
     <p align="center">
-        <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
-        <img src="https://img.shields.io/badge/Django_Rest_Framework-092E20?style=flat-square&logo=django&logoColor=white" />
-        <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white" />
-        <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white" />
+        <img src="https://img.shields.io/badge/-ReactJs-61DAFB?logo=react&logoColor=white&style=for-the-badge" />
+        <img src="https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+        <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+        <img src="https://img.shields.io/badge/Django_Rest_Framework-092E20?style=for-the-badge&logo=django&logoColor=white" />
+        <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
     </p>
     <p>
         💻 Developed by <strong style="color: #3776ab;">Phạm Quốc Tuấn</strong> ❤️<br/>
